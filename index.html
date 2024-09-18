@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Modelo NLG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test del Modelo NLG</h1>
+    <label for="verification_item">Introduce el ítem de verificación:</label>
+    <input type="text" id="verification_item" placeholder="Ej. nombre y apellidos">
+    <button onclick="generatePhrases()">Generar Frases</button>
+
+    <div class="output">
+        <h3>Frases Generadas:</h3>
+        <p><strong>Larga:</strong> <span id="long"></span></p>
+        <p><strong>Media:</strong> <span id="medium"></span></p>
+        <p><strong>Corta:</strong> <span id="short"></span></p>
+    </div>
+
+    <script>
+        async function generatePhrases() {
+            const verificationItem = document.getElementById('verification_item').value;
+            const response = await fetch('https://python-quality-fully.ngrok-free.app/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: 'nlg-verify',
+                    prompt: JSON.stringify({
+                        verification_item: verificationItem,
+                        language: 'es'
+                    }),
+                    stream: false,
+                    keep_alive: '3600m',
+                    options: {
+                        temperature: 0
+                    }
+                }),
+            });
+            const data = await response.json();
+            const phrases = JSON.parse(data.response); // Parse the JSON response
+
+            document.getElementById('long').textContent = phrases.long;
+            document.getElementById('medium').textContent = phrases.medium;
+            document.getElementById('short').textContent = phrases.short;
+        }
+    </script>
+</body>
+</html>
